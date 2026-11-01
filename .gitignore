@@ -10,6 +10,3 @@ dist/
 build/
 .vscode/
 .idea/
-
-# Claude Code 本机专属配置（含权限放行，不纳入版本控制）
-.claude/settings.local.json

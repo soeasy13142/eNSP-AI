@@ -17,7 +17,7 @@
 ## 安装
 
 ```bash
-git clone https://github.com/Redmig110/eNSP-AI.git
+git clone https://github.com/soeasy13142/eNSP-AI.git
 cd eNSP-AI
 pip install -r requirements.txt
 ```
@@ -224,9 +224,6 @@ python topo-server.py
 eNSP-AI/
 ├── requirements.txt          # Python 依赖
 ├── .mcp.json                 # Claude Code 项目级 MCP 配置
-├── CLAUDE.md                 # 给 AI agent 的项目说明
-├── docs/                     # 项目文档：git.md 提交规范、agents/ agent 约定
-├── logs/                     # 项目日志：dev/ 开发、lab/ 实验、troubleshoot/ 排障
 ├── tests/                    # 离线测试（不需要 eNSP 设备）
 ├── topo-viewer.html          # 拓扑可视化（浏览器）
 ├── topo-server.py            # 可视化本地服务器
