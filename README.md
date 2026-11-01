@@ -172,6 +172,8 @@ register_device(name="FW", port=2001, username="admin", password="...")
 - `register_device` / `unregister_device` / `auto_discover` 会自动读写该文件。
 - 未注册的标识不会被拒绝：会被当成 IP 地址、按 23 端口连接。所以看到连接失败时，先确认名字是否已注册。
 
+> `devices.json` 里的设备密码是**明文**保存的。该文件已被 `.gitignore` 排除，不要提交或分享。
+
 ### 典型工作流
 
 **查看状态**
@@ -260,7 +262,7 @@ multi_device_push_config(devices=[
 | `push_config` | `device_ip`, `commands[]` | 自动进 `system-view`；结束后留在系统视图 |
 | `multi_device_push_config` | `devices[{device_ip, commands[]}]` | 同时向多台设备下发配置 |
 | `save_config` | `device_ip` | 保存配置，自动处理 Y/N 与文件名提示 |
-| `get_running_config` | `device_ip`, `section?` | 查看运行配置，`section` 走 `display ... | section` 过滤 |
+| `get_running_config` | `device_ip`, `section?` | 查看运行配置，可按 `section` 过滤 |
 
 #### 网络诊断
 
@@ -388,6 +390,7 @@ python topo-server.py
 
 - **分页回显**：`---- More ----` 处理不当会把相邻两行粘在一起。当前实现检测到分页时就地摘掉标记，兜底清理也不用会吃掉换行的 `\s`。
 - **ANSI 转义**：设备回显可能夹带 ANSI 转义序列，必须先过滤再匹配提示符。
+- **`[Y/N]` 被当成提示符**：宽松的提示符正则会把 `Are you sure to continue? [Y/N]` 当成命令结束，后续配置命令会被当成确认答案。现在统一用严格提示符匹配。
 - **`ping -t` 单位**：VRP 的 `-t` 是**毫秒**。工具固定用 `-t 2000`；如果手工拼成 `-t 2`，每次 ping 都会在回应到达前放弃，表现为 100% 丢包，哪怕目标就是本机接口。
 - **`save_config` 漏答文件名**：部分 S5700 / S3700 在 `[Y/N]` 之后还会追问 `Please input the file name ...`，不回车会导致配置没写盘却看起来成功。工具已补答默认文件名。
 
@@ -421,6 +424,8 @@ python topo-server.py
 
 ```
 eNSP-AI/
+├── README.md                 # 本文件
+├── LICENSE                   # MIT
 ├── requirements.txt          # Python 依赖
 ├── .mcp.json                 # Claude Code 项目级 MCP 配置
 ├── tests/                    # 离线测试（不需要 eNSP 设备）
@@ -475,7 +480,7 @@ PYTHONIOENCODING=utf-8 python tests/test_inspection_offline.py
 本分支的主要增量：
 
 - 控制台登录支持（USG6000V 等需要 `Username:` / `Password:` 的设备）；
-- 分页回显粘连、ANSI 转义、`ping -t` 单位、`save_config` 文件名提示等修复；
+- 分页回显粘连、ANSI 转义、`[Y/N]` 提示符误判、`ping -t` 单位、`save_config` 文件名提示等修复；
 - `.topo` 解析的编码、多段链路、接口编号修复；
 - 新增 `verify_expectations` / `inspect_topology` 验收与巡检工具；
 - 新增 `open_ensp` / `close_ensp` / `open_topology` / `close_topology` 生命周期工具（Win32 ctypes，不依赖 pywin32）；
